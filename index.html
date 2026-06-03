@@ -215,7 +215,7 @@ function pickUpgrades() {
 
 // ─── WORLD OBJECTS ───────────────────────────────────────────────────────────
 let solidRects = [];   // { x, y, w, h } — used for collision
-let worldDecor = {};   // decorative layers
+let worldDecor = { houses:[], walls:[], grassPatches:[], dirtPaths:[], trees:[], rubble:[] };
 
 function ri(a, b) { return Math.floor(a + Math.random() * (b - a)); }
 function rn(a, b) { return a + Math.random() * (b - a); }
@@ -841,10 +841,10 @@ function startGame() {
   mouseWorld = { x: player.x, y: player.y };
   updateHud();
   startRound();
-  requestAnimationFrame(loop);
+  if (!loopStarted) { loopStarted = true; requestAnimationFrame(loop); }
 }
 
-let running = false;
+let loopStarted = false;
 function loop() {
   update();
   draw();
