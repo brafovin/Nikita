@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panzer Krieg</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: 'Courier New', monospace;
+    color: #e0e0e0;
+    overflow: hidden;
+  }
+  #gameContainer {
+    position: relative;
+    border: 2px solid #3a5a3a;
+    box-shadow: 0 0 30px #1a3a1a, 0 0 60px #0a1a0a;
+  }
+  canvas { display: block; }
+  #hud {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: rgba(0,0,0,0.7);
+    pointer-events: none;
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+  .hud-section { display: flex; gap: 18px; align-items: center; }
+  .hud-label { color: #7a9a7a; }
+  .hud-val { color: #aaffaa; font-weight: bold; }
+  #healthBar {
+    width: 120px; height: 10px;
+    background: #222;
+    border: 1px solid #3a5a3a;
+    border-radius: 3px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  #healthFill {
+    height: 100%;
+    background: linear-gradient(90deg, #22cc44, #88ff44);
+    transition: width 0.2s;
+  }
+  #overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 10;
+  }
+  #overlay h1 {
+    font-size: 42px;
+    color: #44ff88;
+    text-shadow: 0 0 20px #22cc44;
+    letter-spacing: 4px;
+  }
+  #overlay h2 {
+    font-size: 22px;
+    color: #aaffaa;
+    letter-spacing: 2px;
+  }
+  #overlay p { color: #7a9a7a; font-size: 14px; text-align: center; line-height: 1.8; }
+  .btn {
+    margin-top: 10px;
+    padding: 12px 32px;
+    background: transparent;
+    border: 2px solid #44aa44;
+    color: #88ff88;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:hover {
+    background: #44aa44;
+    color: #000;
+    box-shadow: 0 0 20px #44aa44;
+  }
+
+  #upgradeScreen {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    z-index: 10;
+  }
+  #upgradeScreen h2 {
+    font-size: 28px;
+    color: #ffdd44;
+    text-shadow: 0 0 15px #ffaa00;
+    letter-spacing: 3px;
+  }
+  #upgradeScreen p { color: #aaa; font-size: 13px; }
+  #upgradeCards {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 700px;
+  }
+  .upgrade-card {
+    width: 160px;
+    border: 2px solid #4a6a4a;
+    background: #0d1a0d;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .upgrade-card:hover {
+    border-color: #ffdd44;
+    background: #1a2a0d;
+    box-shadow: 0 0 20px #ffaa0044;
+    transform: translateY(-3px);
+  }
+  .upgrade-card .icon { font-size: 32px; margin-bottom: 8px; }
+  .upgrade-card .name { color: #ffdd44; font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+  .upgrade-card .desc { color: #aaa; font-size: 11px; line-height: 1.5; }
+  .upgrade-card .rarity-common { border-color: #4a7a4a; }
+  .upgrade-card .rarity-rare { border-color: #4444aa; }
+  .upgrade-card .rarity-epic { border-color: #aa44aa; }
+
+  #roundAnnounce {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 36px;
+    color: #ffdd44;
+    text-shadow: 0 0 20px #ffaa00;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s;
+    z-index: 5;
+    white-space: nowrap;
+    letter-spacing: 3px;
+  }
+</style>
+</head>
+<body>
+<div id="gameContainer">
+  <canvas id="canvas"></canvas>
+  <div id="hud">
+    <div class="hud-section">
+      <span class="hud-label">HP</span>
+      <div id="healthBar"><div id="healthFill" style="width:100%"></div></div>
+      <span class="hud-val" id="hpText">100</span>
+    </div>
+    <div class="hud-section">
+      <span class="hud-label">RUNDE</span>
+      <span class="hud-val" id="roundText">1</span>
+    </div>
+    <div class="hud-section">
+      <span class="hud-label">SCORE</span>
+      <span class="hud-val" id="scoreText">0</span>
+    </div>
+    <div class="hud-section">
+      <span class="hud-label">KILLS</span>
+      <span class="hud-val" id="killText">0</span>
+    </div>
+  </div>
+  <div id="overlay">
+    <h1>PANZER KRIEG</h1>
+    <p>
+      WASD / Pfeiltasten — Bewegen<br>
+      Maus — Zielen &amp; Schießen<br>
+      Überlebe so lange wie möglich!
+    </p>
+    <button class="btn" onclick="startGame()">SPIEL STARTEN</button>
+  </div>
+  <div id="upgradeScreen">
+    <h2>⭐ UPGRADE WÄHLEN ⭐</h2>
+    <p>Runde abgeschlossen — wähle eine Verbesserung für deinen Panzer</p>
+    <div id="upgradeCards"></div>
+  </div>
+  <div id="roundAnnounce"></div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = 800, H = 600;
+canvas.width = W;
+canvas.height = H;
+document.getElementById('gameContainer').style.width = W + 'px';
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let state = 'menu'; // menu | playing | upgrade | dead
+let round = 1, score = 0, kills = 0;
+let enemies = [], bullets = [], enemyBullets = [], particles = [];
+let mouseX = W/2, mouseY = H/2;
+let keys = {};
+let roundTimer = 0;
+let spawnQueue = 0;
+let spawnCooldown = 0;
+let roundEnemiesTotal = 0;
+let roundEnemiesLeft = 0;
+let lastTime = 0;
+
+// ─── UPGRADES STATE ──────────────────────────────────────────────────────────
+let upgrades = {
+  speed: 0,
+  fireRate: 0,
+  damage: 0,
+  multishot: 0,
+  bulletSpeed: 0,
+  maxHp: 0,
+  armor: 0,
+  regen: 0,
+  explosive: 0,
+  pierce: 0,
+};
+
+// ─── PLAYER ──────────────────────────────────────────────────────────────────
+let player = {};
+
+function resetPlayer() {
+  player = {
+    x: W / 2, y: H / 2,
+    angle: 0,
+    hp: 100 + upgrades.maxHp * 25,
+    maxHp: 100 + upgrades.maxHp * 25,
+    speed: 2.2 + upgrades.speed * 0.4,
+    fireCooldown: 0,
+    fireRate: Math.max(6, 22 - upgrades.fireRate * 3),
+    damage: 20 + upgrades.damage * 10,
+    bulletSpeed: 7 + upgrades.bulletSpeed * 1.5,
+    size: 16,
+    regenTimer: 0,
+  };
+}
+
+// ─── UPGRADE POOL ────────────────────────────────────────────────────────────
+const UPGRADE_DEFS = [
+  { id:'speed',       icon:'🏎️',  name:'Turbo-Antrieb',   desc:'Bewegungsgeschwindigkeit +18%', rarity:'common' },
+  { id:'fireRate',    icon:'⚡',   name:'Schnellfeuer',    desc:'Feuerrate stark erhöht',        rarity:'rare'   },
+  { id:'damage',      icon:'💥',   name:'Schwere Munition',desc:'Schaden +10 pro Schuss',        rarity:'rare'   },
+  { id:'multishot',   icon:'🔱',   name:'Drillingsrohr',   desc:'+1 gleichzeitiger Schuss',      rarity:'epic'   },
+  { id:'bulletSpeed', icon:'🚀',   name:'Überschall',      desc:'Projektilgeschwindigkeit +1.5', rarity:'common' },
+  { id:'maxHp',       icon:'❤️',   name:'Verstärkte Panzerung',desc:'Max HP +25',               rarity:'common' },
+  { id:'armor',       icon:'🛡️',  name:'Reaktivpanzerung', desc:'Alle Treffer -4 Schaden',      rarity:'rare'   },
+  { id:'regen',       icon:'🔧',   name:'Selbstreparatur',  desc:'HP regeneriert langsam',       rarity:'epic'   },
+  { id:'explosive',   icon:'💣',   name:'Sprenggranaten',   desc:'Treffer erzeugen Explosion',   rarity:'epic'   },
+  { id:'pierce',      icon:'🗡️',  name:'Panzerbrechend',   desc:'Kugeln durchdringen Gegner',   rarity:'rare'   },
+];
+
+function pickUpgrades() {
+  const pool = [...UPGRADE_DEFS];
+  // shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  // give 3 choices, prefer variety
+  return pool.slice(0, 3);
+}
+
+// ─── ENEMY TYPES ─────────────────────────────────────────────────────────────
+function enemyConfig(type, tier) {
+  const t = tier; // every 5 rounds
+  const configs = {
+    basic: {
+      hp: 30 + t * 20, speed: 0.8 + t * 0.15, damage: 8 + t * 3,
+      size: 14, color: '#cc4444', fireRate: 90, score: 10,
+      bulletSpeed: 3.5, label: 'Panzer'
+    },
+    fast: {
+      hp: 18 + t * 12, speed: 1.8 + t * 0.3, damage: 5 + t * 2,
+      size: 10, color: '#cc8833', fireRate: 70, score: 15,
+      bulletSpeed: 4, label: 'Späher'
+    },
+    heavy: {
+      hp: 80 + t * 50, speed: 0.45 + t * 0.08, damage: 18 + t * 6,
+      size: 20, color: '#884444', fireRate: 140, score: 30,
+      bulletSpeed: 3, label: 'Schwer'
+    },
+    sniper: {
+      hp: 25 + t * 15, speed: 0.6 + t * 0.1, damage: 30 + t * 10,
+      size: 12, color: '#aa44cc', fireRate: 180, score: 25,
+      bulletSpeed: 8, label: 'Scharfsch.'
+    },
+    boss: {
+      hp: 250 + t * 150, speed: 0.5 + t * 0.1, damage: 25 + t * 8,
+      size: 26, color: '#cc2222', fireRate: 60, score: 100,
+      bulletSpeed: 4.5, label: 'BOSS'
+    },
+  };
+  return configs[type] || configs.basic;
+}
+
+function spawnEnemy() {
+  const tier = Math.floor((round - 1) / 5);
+  let type = 'basic';
+  const r = Math.random();
+  if (round >= 3 && r < 0.2) type = 'fast';
+  if (round >= 5 && r < 0.15) type = 'heavy';
+  if (round >= 8 && r < 0.12) type = 'sniper';
+  if (round >= 10 && r < 0.05) type = 'boss';
+
+  const cfg = enemyConfig(type, tier);
+  // spawn outside viewport
+  let x, y;
+  const side = Math.floor(Math.random() * 4);
+  if (side === 0) { x = Math.random() * W; y = -cfg.size; }
+  else if (side === 1) { x = W + cfg.size; y = Math.random() * H; }
+  else if (side === 2) { x = Math.random() * W; y = H + cfg.size; }
+  else { x = -cfg.size; y = Math.random() * H; }
+
+  enemies.push({
+    x, y, type, ...cfg,
+    maxHp: cfg.hp,
+    angle: 0,
+    fireCooldown: Math.floor(Math.random() * cfg.fireRate),
+    id: Math.random(),
+  });
+}
+
+// ─── BULLETS ─────────────────────────────────────────────────────────────────
+function firePlayer() {
+  if (player.fireCooldown > 0) return;
+  player.fireCooldown = player.fireRate;
+
+  const shots = 1 + upgrades.multishot;
+  const spread = (shots - 1) * 0.12;
+  const dx = mouseX - player.x, dy = mouseY - player.y;
+  const baseAngle = Math.atan2(dy, dx);
+
+  for (let i = 0; i < shots; i++) {
+    const angle = baseAngle - spread / 2 + (spread / Math.max(1, shots - 1)) * i;
+    bullets.push({
+      x: player.x, y: player.y,
+      vx: Math.cos(angle) * player.bulletSpeed,
+      vy: Math.sin(angle) * player.bulletSpeed,
+      damage: player.damage,
+      pierce: upgrades.pierce,
+      explosive: upgrades.explosive > 0,
+      life: 120,
+    });
+  }
+  // muzzle flash
+  spawnParticles(player.x, player.y, '#ffff88', 4, 2);
+}
+
+function fireEnemy(e) {
+  const dx = player.x - e.x, dy = player.y - e.y;
+  const angle = Math.atan2(dy, dx);
+  enemyBullets.push({
+    x: e.x, y: e.y,
+    vx: Math.cos(angle) * e.bulletSpeed,
+    vy: Math.sin(angle) * e.bulletSpeed,
+    damage: e.damage,
+    life: 150,
+  });
+}
+
+// ─── PARTICLES ───────────────────────────────────────────────────────────────
+function spawnParticles(x, y, color, count, speed) {
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const s = (Math.random() + 0.5) * speed;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * s,
+      vy: Math.sin(angle) * s,
+      color,
+      life: 20 + Math.random() * 20,
+      maxLife: 40,
+      size: 2 + Math.random() * 3,
+    });
+  }
+}
+
+// ─── DRAW TANK ────────────────────────────────────────────────────────────────
+function drawTank(x, y, angle, size, bodyColor, turretColor, isPlayer) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+
+  // tracks
+  ctx.fillStyle = '#333';
+  ctx.fillRect(-size * 0.9, -size * 0.7, size * 1.8, size * 0.35);
+  ctx.fillRect(-size * 0.9, size * 0.35, size * 1.8, size * 0.35);
+
+  // body
+  ctx.fillStyle = bodyColor;
+  ctx.fillRect(-size * 0.75, -size * 0.55, size * 1.5, size * 1.1);
+
+  // turret base
+  ctx.fillStyle = turretColor;
+  ctx.beginPath();
+  ctx.arc(0, 0, size * 0.45, 0, Math.PI * 2);
+  ctx.fill();
+
+  // barrel
+  ctx.fillStyle = turretColor;
+  ctx.fillRect(0, -size * 0.12, size * 1.1, size * 0.24);
+
+  if (isPlayer) {
+    // player indicator dot
+    ctx.fillStyle = '#88ff88';
+    ctx.beginPath();
+    ctx.arc(0, 0, 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// ─── DRAW HP BAR ─────────────────────────────────────────────────────────────
+function drawHpBar(x, y, hp, maxHp, w, h) {
+  ctx.fillStyle = '#111';
+  ctx.fillRect(x - w/2, y, w, h);
+  const pct = Math.max(0, hp / maxHp);
+  const barColor = pct > 0.5 ? '#44cc44' : pct > 0.25 ? '#cccc22' : '#cc2222';
+  ctx.fillStyle = barColor;
+  ctx.fillRect(x - w/2, y, w * pct, h);
+}
+
+// ─── ROUND ANNOUNCE ──────────────────────────────────────────────────────────
+function announceRound(text) {
+  const el = document.getElementById('roundAnnounce');
+  el.textContent = text;
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, 1800);
+}
+
+// ─── ROUND SETUP ─────────────────────────────────────────────────────────────
+function startRound() {
+  state = 'playing';
+  enemies = [];
+  bullets = [];
+  enemyBullets = [];
+  particles = [];
+
+  // number of enemies scales with round
+  roundEnemiesTotal = 3 + round * 2 + Math.floor(round / 5) * 3;
+  roundEnemiesLeft = roundEnemiesTotal;
+  spawnQueue = roundEnemiesTotal;
+  spawnCooldown = 0;
+
+  document.getElementById('roundText').textContent = round;
+  announceRound(`RUNDE ${round}${round % 5 === 0 ? ' — ANGRIFFSWELLE!' : ''}`);
+}
+
+// ─── UPDATE ──────────────────────────────────────────────────────────────────
+function update(dt) {
+  if (state !== 'playing') return;
+
+  // player movement
+  let dx = 0, dy = 0;
+  if (keys['w'] || keys['arrowup'])    dy -= 1;
+  if (keys['s'] || keys['arrowdown'])  dy += 1;
+  if (keys['a'] || keys['arrowleft'])  dx -= 1;
+  if (keys['d'] || keys['arrowright']) dx += 1;
+  if (dx !== 0 && dy !== 0) { dx *= 0.707; dy *= 0.707; }
+  player.x = Math.max(player.size, Math.min(W - player.size, player.x + dx * player.speed));
+  player.y = Math.max(player.size + 30, Math.min(H - player.size, player.y + dy * player.speed));
+  player.angle = Math.atan2(mouseY - player.y, mouseX - player.x);
+
+  // fire cooldown
+  if (player.fireCooldown > 0) player.fireCooldown--;
+
+  // regen
+  if (upgrades.regen > 0) {
+    player.regenTimer++;
+    if (player.regenTimer >= 120) {
+      player.regenTimer = 0;
+      player.hp = Math.min(player.maxHp, player.hp + upgrades.regen * 2);
+      updateHud();
+    }
+  }
+
+  // spawn enemies
+  if (spawnQueue > 0 && enemies.length < Math.min(8 + round, 20)) {
+    spawnCooldown--;
+    if (spawnCooldown <= 0) {
+      spawnEnemy();
+      spawnQueue--;
+      spawnCooldown = Math.max(20, 80 - round * 3);
+    }
+  }
+
+  // update enemies
+  for (let i = enemies.length - 1; i >= 0; i--) {
+    const e = enemies[i];
+    const ddx = player.x - e.x, ddy = player.y - e.y;
+    const dist = Math.sqrt(ddx * ddx + ddy * ddy);
+    e.angle = Math.atan2(ddy, ddx);
+
+    if (dist > e.size + player.size) {
+      e.x += (ddx / dist) * e.speed;
+      e.y += (ddy / dist) * e.speed;
+    } else {
+      // ram player
+      player.hp -= e.damage * 0.05;
+      if (upgrades.armor > 0) player.hp += upgrades.armor * 0.05 * 4;
+      updateHud();
+      if (player.hp <= 0) { gameOver(); return; }
+    }
+
+    // enemy fire
+    e.fireCooldown--;
+    if (e.fireCooldown <= 0 && dist < 400) {
+      fireEnemy(e);
+      e.fireCooldown = e.fireRate;
+    }
+  }
+
+  // update player bullets
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    const b = bullets[i];
+    b.x += b.vx; b.y += b.vy; b.life--;
+    if (b.life <= 0 || b.x < 0 || b.x > W || b.y < 30 || b.y > H) {
+      bullets.splice(i, 1); continue;
+    }
+    // hit enemies
+    let hit = false;
+    for (let j = enemies.length - 1; j >= 0; j--) {
+      const e = enemies[j];
+      const dx2 = b.x - e.x, dy2 = b.y - e.y;
+      if (dx2 * dx2 + dy2 * dy2 < (e.size + 5) * (e.size + 5)) {
+        e.hp -= b.damage;
+        spawnParticles(b.x, b.y, '#ff8822', 6, 3);
+        if (b.explosive) {
+          // splash
+          spawnParticles(b.x, b.y, '#ffaa00', 12, 5);
+          for (let k = enemies.length - 1; k >= 0; k--) {
+            const e2 = enemies[k];
+            const sdx = b.x - e2.x, sdy = b.y - e2.y;
+            if (sdx * sdx + sdy * sdy < 2500) {
+              e2.hp -= b.damage * 0.5;
+            }
+          }
+        }
+        if (!b.pierce) { bullets.splice(i, 1); hit = true; }
+        if (e.hp <= 0) {
+          score += e.score * round;
+          kills++;
+          roundEnemiesLeft--;
+          spawnParticles(e.x, e.y, e.color, 14, 3);
+          enemies.splice(j, 1);
+          updateHud();
+        }
+        if (hit) break;
+      }
+    }
+  }
+
+  // update enemy bullets
+  for (let i = enemyBullets.length - 1; i >= 0; i--) {
+    const b = enemyBullets[i];
+    b.x += b.vx; b.y += b.vy; b.life--;
+    if (b.life <= 0 || b.x < 0 || b.x > W || b.y < 30 || b.y > H) {
+      enemyBullets.splice(i, 1); continue;
+    }
+    const ddx = b.x - player.x, ddy = b.y - player.y;
+    if (ddx * ddx + ddy * ddy < (player.size + 4) * (player.size + 4)) {
+      let dmg = b.damage - upgrades.armor * 4;
+      player.hp -= Math.max(1, dmg);
+      spawnParticles(b.x, b.y, '#ff4444', 5, 2);
+      enemyBullets.splice(i, 1);
+      updateHud();
+      if (player.hp <= 0) { gameOver(); return; }
+    }
+  }
+
+  // update particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.vx *= 0.92; p.vy *= 0.92;
+    p.life--;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+
+  // check round end
+  if (spawnQueue === 0 && enemies.length === 0 && roundEnemiesLeft <= 0) {
+    roundComplete();
+  }
+}
+
+// ─── DRAW ─────────────────────────────────────────────────────────────────────
+function draw() {
+  // background grid
+  ctx.fillStyle = '#0d1a0d';
+  ctx.fillRect(0, 30, W, H - 30);
+
+  ctx.strokeStyle = '#1a2a1a';
+  ctx.lineWidth = 1;
+  const gridSize = 40;
+  for (let x = 0; x < W; x += gridSize) {
+    ctx.beginPath(); ctx.moveTo(x, 30); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 30; y < H; y += gridSize) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // particles
+  for (const p of particles) {
+    const alpha = p.life / p.maxLife;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // player bullets
+  for (const b of bullets) {
+    ctx.fillStyle = '#ffff44';
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = '#ffaa00';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // enemy bullets
+  for (const b of enemyBullets) {
+    ctx.fillStyle = '#ff4444';
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = '#ff0000';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // enemies
+  for (const e of enemies) {
+    drawTank(e.x, e.y, e.angle, e.size, e.color, '#882222', false);
+    drawHpBar(e.x, e.y - e.size - 10, e.hp, e.maxHp, e.size * 2.5, 5);
+    // label for boss
+    if (e.type === 'boss') {
+      ctx.fillStyle = '#ff4444';
+      ctx.font = 'bold 10px Courier New';
+      ctx.textAlign = 'center';
+      ctx.fillText('BOSS', e.x, e.y - e.size - 16);
+    }
+  }
+
+  // player
+  drawTank(player.x, player.y, player.angle, player.size, '#336633', '#224422', true);
+}
+
+// ─── HUD UPDATE ──────────────────────────────────────────────────────────────
+function updateHud() {
+  const pct = Math.max(0, player.hp / player.maxHp * 100);
+  document.getElementById('healthFill').style.width = pct + '%';
+  document.getElementById('hpText').textContent = Math.ceil(player.hp);
+  document.getElementById('scoreText').textContent = score;
+  document.getElementById('killText').textContent = kills;
+  document.getElementById('roundText').textContent = round;
+}
+
+// ─── ROUND COMPLETE ──────────────────────────────────────────────────────────
+function roundComplete() {
+  state = 'upgrade';
+  // heal a bit between rounds
+  player.hp = Math.min(player.maxHp, player.hp + 20);
+  updateHud();
+
+  const choices = pickUpgrades();
+  const container = document.getElementById('upgradeCards');
+  container.innerHTML = '';
+  for (const u of choices) {
+    const card = document.createElement('div');
+    card.className = 'upgrade-card';
+    card.innerHTML = `
+      <div class="icon">${u.icon}</div>
+      <div class="name">${u.name}</div>
+      <div class="desc">${u.desc}</div>
+      <div style="margin-top:8px;font-size:10px;color:${u.rarity==='epic'?'#cc44cc':u.rarity==='rare'?'#4444ff':'#44aa44'}">${u.rarity.toUpperCase()}</div>
+    `;
+    card.onclick = () => selectUpgrade(u.id);
+    container.appendChild(card);
+  }
+  document.getElementById('upgradeScreen').style.display = 'flex';
+}
+
+function selectUpgrade(id) {
+  upgrades[id]++;
+  document.getElementById('upgradeScreen').style.display = 'none';
+  round++;
+  // rebuild player with new upgrades (keep hp)
+  const prevHp = player.hp;
+  resetPlayer();
+  player.hp = Math.min(player.maxHp, prevHp);
+  updateHud();
+  startRound();
+}
+
+// ─── GAME OVER ───────────────────────────────────────────────────────────────
+function gameOver() {
+  state = 'dead';
+  document.getElementById('overlay').innerHTML = `
+    <h1>GAME OVER</h1>
+    <h2>RUNDE ${round}</h2>
+    <p>Score: ${score}<br>Kills: ${kills}</p>
+    <button class="btn" onclick="startGame()">NEU STARTEN</button>
+  `;
+  document.getElementById('overlay').style.display = 'flex';
+}
+
+// ─── START GAME ──────────────────────────────────────────────────────────────
+function startGame() {
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('upgradeScreen').style.display = 'none';
+  round = 1; score = 0; kills = 0;
+  upgrades = { speed:0,fireRate:0,damage:0,multishot:0,bulletSpeed:0,maxHp:0,armor:0,regen:0,explosive:0,pierce:0 };
+  resetPlayer();
+  updateHud();
+  startRound();
+  if (!lastTime) requestAnimationFrame(loop);
+}
+
+// ─── GAME LOOP ────────────────────────────────────────────────────────────────
+function loop(ts) {
+  const dt = Math.min((ts - (lastTime || ts)) / 16.67, 3);
+  lastTime = ts;
+
+  update(dt);
+  draw();
+
+  requestAnimationFrame(loop);
+}
+
+// ─── INPUT ────────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  keys[e.key.toLowerCase()] = true;
+  if (state === 'playing') e.preventDefault();
+});
+document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  mouseX = e.clientX - rect.left;
+  mouseY = e.clientY - rect.top;
+});
+
+canvas.addEventListener('mousedown', e => {
+  if (state === 'playing') firePlayer();
+});
+
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+// auto-fire on hold
+setInterval(() => {
+  if (state === 'playing' && mouseDown) firePlayer();
+}, 20);
+let mouseDown = false;
+canvas.addEventListener('mousedown', () => mouseDown = true);
+canvas.addEventListener('mouseup', () => mouseDown = false);
+
+// initial draw
+ctx.fillStyle = '#0d1a0d';
+ctx.fillRect(0, 0, W, H);
+</script>
+</body>
+</html>
