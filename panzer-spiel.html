@@ -7,7 +7,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background: #0a0a0f;
+    background: #1a1a0a;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -19,28 +19,28 @@
   }
   #gameContainer {
     position: relative;
-    border: 2px solid #3a5a3a;
-    box-shadow: 0 0 30px #1a3a1a, 0 0 60px #0a1a0a;
+    border: 2px solid #3a5a2a;
+    box-shadow: 0 0 30px #1a3a0a, 0 0 60px #0a1a00;
   }
-  canvas { display: block; }
+  canvas { display: block; cursor: crosshair; }
   #hud {
     position: absolute;
     top: 0; left: 0; right: 0;
     display: flex;
     justify-content: space-between;
     padding: 8px 14px;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.75);
     pointer-events: none;
     font-size: 13px;
     letter-spacing: 1px;
   }
   .hud-section { display: flex; gap: 18px; align-items: center; }
-  .hud-label { color: #7a9a7a; }
-  .hud-val { color: #aaffaa; font-weight: bold; }
+  .hud-label { color: #7a9a5a; }
+  .hud-val { color: #aaff88; font-weight: bold; }
   #healthBar {
     width: 120px; height: 10px;
     background: #222;
-    border: 1px solid #3a5a3a;
+    border: 1px solid #3a5a2a;
     border-radius: 3px;
     overflow: hidden;
     display: inline-block;
@@ -54,7 +54,7 @@
   #overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0,0,0,0.88);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -64,16 +64,12 @@
   }
   #overlay h1 {
     font-size: 42px;
-    color: #44ff88;
+    color: #66ff66;
     text-shadow: 0 0 20px #22cc44;
     letter-spacing: 4px;
   }
-  #overlay h2 {
-    font-size: 22px;
-    color: #aaffaa;
-    letter-spacing: 2px;
-  }
-  #overlay p { color: #7a9a7a; font-size: 14px; text-align: center; line-height: 1.8; }
+  #overlay h2 { font-size: 22px; color: #aaff88; letter-spacing: 2px; }
+  #overlay p { color: #7a9a6a; font-size: 14px; text-align: center; line-height: 1.9; }
   .btn {
     margin-top: 10px;
     padding: 12px 32px;
@@ -86,16 +82,12 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  .btn:hover {
-    background: #44aa44;
-    color: #000;
-    box-shadow: 0 0 20px #44aa44;
-  }
+  .btn:hover { background: #44aa44; color: #000; box-shadow: 0 0 20px #44aa44; }
 
   #upgradeScreen {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.92);
+    background: rgba(0,0,0,0.93);
     display: none;
     flex-direction: column;
     align-items: center;
@@ -103,24 +95,13 @@
     gap: 20px;
     z-index: 10;
   }
-  #upgradeScreen h2 {
-    font-size: 28px;
-    color: #ffdd44;
-    text-shadow: 0 0 15px #ffaa00;
-    letter-spacing: 3px;
-  }
+  #upgradeScreen h2 { font-size: 28px; color: #ffdd44; text-shadow: 0 0 15px #ffaa00; letter-spacing: 3px; }
   #upgradeScreen p { color: #aaa; font-size: 13px; }
-  #upgradeCards {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 700px;
-  }
+  #upgradeCards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; max-width: 720px; }
   .upgrade-card {
-    width: 160px;
-    border: 2px solid #4a6a4a;
-    background: #0d1a0d;
+    width: 168px;
+    border: 2px solid #4a6a3a;
+    background: #0d1a08;
     padding: 16px;
     cursor: pointer;
     transition: all 0.2s;
@@ -128,21 +109,18 @@
   }
   .upgrade-card:hover {
     border-color: #ffdd44;
-    background: #1a2a0d;
-    box-shadow: 0 0 20px #ffaa0044;
-    transform: translateY(-3px);
+    background: #1a2a08;
+    box-shadow: 0 0 22px #ffaa0044;
+    transform: translateY(-4px);
   }
   .upgrade-card .icon { font-size: 32px; margin-bottom: 8px; }
-  .upgrade-card .name { color: #ffdd44; font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+  .upgrade-card .name { font-size: 14px; font-weight: bold; margin-bottom: 6px; }
   .upgrade-card .desc { color: #aaa; font-size: 11px; line-height: 1.5; }
-  .upgrade-card .rarity-common { border-color: #4a7a4a; }
-  .upgrade-card .rarity-rare { border-color: #4444aa; }
-  .upgrade-card .rarity-epic { border-color: #aa44aa; }
+  .rarity-tag { margin-top: 8px; font-size: 10px; font-weight: bold; letter-spacing: 1px; }
 
   #roundAnnounce {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     font-size: 36px;
     color: #ffdd44;
@@ -153,6 +131,13 @@
     z-index: 5;
     white-space: nowrap;
     letter-spacing: 3px;
+  }
+  #minimap {
+    position: absolute;
+    bottom: 8px; right: 8px;
+    border: 1px solid #3a5a2a;
+    background: rgba(0,0,0,0.5);
+    pointer-events: none;
   }
 </style>
 </head>
@@ -182,7 +167,7 @@
     <h1>PANZER KRIEG</h1>
     <p>
       WASD / Pfeiltasten — Bewegen<br>
-      Maus — Zielen &amp; Schießen<br>
+      Maus — Zielen &amp; Schießen (halten)<br>
       Überlebe so lange wie möglich!
     </p>
     <button class="btn" onclick="startGame()">SPIEL STARTEN</button>
@@ -193,53 +178,156 @@
     <div id="upgradeCards"></div>
   </div>
   <div id="roundAnnounce"></div>
+  <canvas id="minimap" width="120" height="80"></canvas>
 </div>
 
 <script>
+// ─── CANVAS / VIEWPORT ───────────────────────────────────────────────────────
 const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const W = 800, H = 600;
-canvas.width = W;
-canvas.height = H;
-document.getElementById('gameContainer').style.width = W + 'px';
+const ctx    = canvas.getContext('2d');
+const VW = 900, VH = 650;  // viewport
+const MW = 1600, MH = 1100; // world map
+canvas.width = VW; canvas.height = VH;
+document.getElementById('gameContainer').style.width = VW + 'px';
+
+const mmCanvas = document.getElementById('minimap');
+const mmCtx    = mmCanvas.getContext('2d');
+
+// camera
+let cam = { x: 0, y: 0 };
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
-let state = 'menu'; // menu | playing | upgrade | dead
+let state = 'menu';
 let round = 1, score = 0, kills = 0;
 let enemies = [], bullets = [], enemyBullets = [], particles = [];
-let mouseX = W/2, mouseY = H/2;
+let mouseX = VW/2, mouseY = VH/2;
+let mouseDown = false;
 let keys = {};
-let roundTimer = 0;
-let spawnQueue = 0;
-let spawnCooldown = 0;
-let roundEnemiesTotal = 0;
-let roundEnemiesLeft = 0;
+let spawnQueue = 0, spawnCooldown = 0;
+let roundEnemiesTotal = 0, roundEnemiesLeft = 0;
 let lastTime = 0;
 
-// ─── UPGRADES STATE ──────────────────────────────────────────────────────────
-let upgrades = {
-  speed: 0,
-  fireRate: 0,
-  damage: 0,
-  multishot: 0,
-  bulletSpeed: 0,
-  maxHp: 0,
-  armor: 0,
-  regen: 0,
-  explosive: 0,
-  pierce: 0,
-};
+// ─── UPGRADES ────────────────────────────────────────────────────────────────
+let upgrades = { speed:0,fireRate:0,damage:0,multishot:0,bulletSpeed:0,maxHp:0,armor:0,regen:0,explosive:0,pierce:0 };
+
+// Weights: common=60, rare=25, epic=15 → drawn weighted
+const UPGRADE_DEFS = [
+  { id:'speed',       icon:'🏎️',  name:'Turbo-Antrieb',      desc:'Bewegungsgeschwindigkeit +18%',  rarity:'common', weight:20 },
+  { id:'bulletSpeed', icon:'🚀',   name:'Überschall',          desc:'Projektile +1.5 schneller',      rarity:'common', weight:20 },
+  { id:'maxHp',       icon:'❤️',   name:'Verstärkte Panzerung',desc:'Max HP +25',                    rarity:'common', weight:20 },
+  { id:'fireRate',    icon:'⚡',   name:'Schnellfeuer',         desc:'Feuerrate stark erhöht',         rarity:'rare',   weight:9  },
+  { id:'damage',      icon:'💥',   name:'Schwere Munition',    desc:'Schaden +10 pro Schuss',         rarity:'rare',   weight:9  },
+  { id:'armor',       icon:'🛡️',  name:'Reaktivpanzerung',    desc:'Alle Treffer -4 Schaden',        rarity:'rare',   weight:7  },
+  { id:'pierce',      icon:'🗡️',  name:'Panzerbrechend',      desc:'Kugeln durchdringen Gegner',     rarity:'rare',   weight:5  },
+  { id:'regen',       icon:'🔧',   name:'Selbstreparatur',     desc:'HP regeneriert langsam',         rarity:'epic',   weight:4  },
+  { id:'explosive',   icon:'💣',   name:'Sprenggranaten',      desc:'Treffer erzeugen Explosion',     rarity:'epic',   weight:4  },
+  { id:'multishot',   icon:'🔱',   name:'Drillingsrohr',       desc:'+1 gleichzeitiger Schuss',       rarity:'epic',   weight:2  },
+];
+
+function pickUpgrades() {
+  // weighted random without replacement
+  let pool = UPGRADE_DEFS.map(u => ({...u}));
+  const result = [];
+  for (let pick = 0; pick < 3 && pool.length > 0; pick++) {
+    const total = pool.reduce((s, u) => s + u.weight, 0);
+    let r = Math.random() * total;
+    let chosen = pool[pool.length - 1];
+    for (const u of pool) { r -= u.weight; if (r <= 0) { chosen = u; break; } }
+    result.push(chosen);
+    pool = pool.filter(u => u.id !== chosen.id);
+  }
+  return result;
+}
+
+// ─── WORLD OBJECTS ───────────────────────────────────────────────────────────
+let worldObjects = []; // { type, x, y, w, h, parts }
+
+function buildWorld() {
+  worldObjects = [];
+  const rng = (a, b) => a + Math.random() * (b - a);
+  const ri  = (a, b) => Math.floor(rng(a, b));
+
+  // ── Destroyed houses (4 total) ──────────────────────────────────────────
+  const housePositions = [
+    { x: 200,  y: 180 },
+    { x: 1200, y: 200 },
+    { x: 250,  y: 800 },
+    { x: 1100, y: 780 },
+  ];
+  for (const hp of housePositions) {
+    const w = 100 + ri(0, 40), h = 90 + ri(0, 30);
+    worldObjects.push({ type: 'house', x: hp.x, y: hp.y, w, h });
+  }
+
+  // ── Destroyed wall segments (8 segments) ────────────────────────────────
+  const wallDefs = [
+    { x: 500,  y: 300,  w: 120, h: 14 },
+    { x: 650,  y: 300,  w: 80,  h: 14 },
+    { x: 900,  y: 500,  w: 14,  h: 100 },
+    { x: 900,  y: 640,  w: 14,  h: 70  },
+    { x: 400,  y: 700,  w: 90,  h: 14  },
+    { x: 1050, y: 380,  w: 110, h: 14  },
+    { x: 700,  y: 850,  w: 14,  h: 90  },
+    { x: 300,  y: 450,  w: 80,  h: 14  },
+  ];
+  for (const wd of wallDefs) worldObjects.push({ type: 'wall', ...wd });
+
+  // ── Grass patches (random decorative) ───────────────────────────────────
+  const grassPatches = [];
+  for (let i = 0; i < 60; i++) {
+    grassPatches.push({ x: ri(20, MW - 20), y: ri(20, MH - 20), r: ri(15, 45), shade: ri(0, 3) });
+  }
+  worldObjects.push({ type: 'grassPatches', patches: grassPatches });
+
+  // ── Mud / dirt paths ─────────────────────────────────────────────────────
+  const dirtPaths = [
+    { x: 0,   y: MH/2 - 20, w: MW, h: 40 },  // horizontal
+    { x: MW/2 - 20, y: 0, w: 40, h: MH },     // vertical
+  ];
+  worldObjects.push({ type: 'dirtPaths', paths: dirtPaths });
+
+  // ── Trees / bushes ───────────────────────────────────────────────────────
+  const trees = [];
+  for (let i = 0; i < 40; i++) {
+    const tx = ri(30, MW - 30), ty = ri(30, MH - 30);
+    // avoid center spawn area
+    if (Math.abs(tx - MW/2) < 120 && Math.abs(ty - MH/2) < 100) continue;
+    trees.push({ x: tx, y: ty, r: ri(10, 22), isTree: Math.random() > 0.4 });
+  }
+  worldObjects.push({ type: 'trees', items: trees });
+
+  // ── Rubble piles ─────────────────────────────────────────────────────────
+  const rubble = [];
+  for (let i = 0; i < 20; i++) {
+    rubble.push({ x: ri(60, MW - 60), y: ri(60, MH - 60), size: ri(8, 18) });
+  }
+  worldObjects.push({ type: 'rubble', items: rubble });
+}
+
+// AABB collision with world solid objects
+function collidesWithWorld(x, y, r) {
+  for (const obj of worldObjects) {
+    if (obj.type === 'house') {
+      if (x + r > obj.x && x - r < obj.x + obj.w &&
+          y + r > obj.y && y - r < obj.y + obj.h) return true;
+    }
+    if (obj.type === 'wall') {
+      if (x + r > obj.x && x - r < obj.x + obj.w &&
+          y + r > obj.y && y - r < obj.y + obj.h) return true;
+    }
+  }
+  return false;
+}
 
 // ─── PLAYER ──────────────────────────────────────────────────────────────────
 let player = {};
-
 function resetPlayer() {
   player = {
-    x: W / 2, y: H / 2,
+    x: MW / 2, y: MH / 2,
     angle: 0,
     hp: 100 + upgrades.maxHp * 25,
     maxHp: 100 + upgrades.maxHp * 25,
-    speed: 2.2 + upgrades.speed * 0.4,
+    speed: 2.3 + upgrades.speed * 0.4,
     fireCooldown: 0,
     fireRate: Math.max(6, 22 - upgrades.fireRate * 3),
     damage: 20 + upgrades.damage * 10,
@@ -249,103 +337,51 @@ function resetPlayer() {
   };
 }
 
-// ─── UPGRADE POOL ────────────────────────────────────────────────────────────
-const UPGRADE_DEFS = [
-  { id:'speed',       icon:'🏎️',  name:'Turbo-Antrieb',   desc:'Bewegungsgeschwindigkeit +18%', rarity:'common' },
-  { id:'fireRate',    icon:'⚡',   name:'Schnellfeuer',    desc:'Feuerrate stark erhöht',        rarity:'rare'   },
-  { id:'damage',      icon:'💥',   name:'Schwere Munition',desc:'Schaden +10 pro Schuss',        rarity:'rare'   },
-  { id:'multishot',   icon:'🔱',   name:'Drillingsrohr',   desc:'+1 gleichzeitiger Schuss',      rarity:'epic'   },
-  { id:'bulletSpeed', icon:'🚀',   name:'Überschall',      desc:'Projektilgeschwindigkeit +1.5', rarity:'common' },
-  { id:'maxHp',       icon:'❤️',   name:'Verstärkte Panzerung',desc:'Max HP +25',               rarity:'common' },
-  { id:'armor',       icon:'🛡️',  name:'Reaktivpanzerung', desc:'Alle Treffer -4 Schaden',      rarity:'rare'   },
-  { id:'regen',       icon:'🔧',   name:'Selbstreparatur',  desc:'HP regeneriert langsam',       rarity:'epic'   },
-  { id:'explosive',   icon:'💣',   name:'Sprenggranaten',   desc:'Treffer erzeugen Explosion',   rarity:'epic'   },
-  { id:'pierce',      icon:'🗡️',  name:'Panzerbrechend',   desc:'Kugeln durchdringen Gegner',   rarity:'rare'   },
-];
-
-function pickUpgrades() {
-  const pool = [...UPGRADE_DEFS];
-  // shuffle
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  // give 3 choices, prefer variety
-  return pool.slice(0, 3);
-}
-
 // ─── ENEMY TYPES ─────────────────────────────────────────────────────────────
 function enemyConfig(type, tier) {
-  const t = tier; // every 5 rounds
-  const configs = {
-    basic: {
-      hp: 30 + t * 20, speed: 0.8 + t * 0.15, damage: 8 + t * 3,
-      size: 14, color: '#cc4444', fireRate: 90, score: 10,
-      bulletSpeed: 3.5, label: 'Panzer'
-    },
-    fast: {
-      hp: 18 + t * 12, speed: 1.8 + t * 0.3, damage: 5 + t * 2,
-      size: 10, color: '#cc8833', fireRate: 70, score: 15,
-      bulletSpeed: 4, label: 'Späher'
-    },
-    heavy: {
-      hp: 80 + t * 50, speed: 0.45 + t * 0.08, damage: 18 + t * 6,
-      size: 20, color: '#884444', fireRate: 140, score: 30,
-      bulletSpeed: 3, label: 'Schwer'
-    },
-    sniper: {
-      hp: 25 + t * 15, speed: 0.6 + t * 0.1, damage: 30 + t * 10,
-      size: 12, color: '#aa44cc', fireRate: 180, score: 25,
-      bulletSpeed: 8, label: 'Scharfsch.'
-    },
-    boss: {
-      hp: 250 + t * 150, speed: 0.5 + t * 0.1, damage: 25 + t * 8,
-      size: 26, color: '#cc2222', fireRate: 60, score: 100,
-      bulletSpeed: 4.5, label: 'BOSS'
-    },
-  };
-  return configs[type] || configs.basic;
+  const t = tier;
+  return ({
+    basic:  { hp:30+t*20,  speed:0.8+t*0.15,  damage:8+t*3,   size:14, color:'#cc4444', fireRate:90,  score:10,  bulletSpeed:3.5 },
+    fast:   { hp:18+t*12,  speed:1.9+t*0.3,   damage:5+t*2,   size:10, color:'#cc8833', fireRate:65,  score:15,  bulletSpeed:4.2 },
+    heavy:  { hp:80+t*50,  speed:0.45+t*0.08, damage:18+t*6,  size:20, color:'#884444', fireRate:140, score:30,  bulletSpeed:3.0 },
+    sniper: { hp:25+t*15,  speed:0.6+t*0.1,   damage:30+t*10, size:12, color:'#aa44cc', fireRate:180, score:25,  bulletSpeed:8.0 },
+    boss:   { hp:250+t*150,speed:0.5+t*0.1,   damage:25+t*8,  size:26, color:'#cc2222', fireRate:55,  score:100, bulletSpeed:4.5 },
+  })[type] || {};
 }
 
 function spawnEnemy() {
   const tier = Math.floor((round - 1) / 5);
-  let type = 'basic';
   const r = Math.random();
-  if (round >= 3 && r < 0.2) type = 'fast';
-  if (round >= 5 && r < 0.15) type = 'heavy';
-  if (round >= 8 && r < 0.12) type = 'sniper';
+  let type = 'basic';
+  if (round >= 3  && r < 0.20) type = 'fast';
+  if (round >= 5  && r < 0.15) type = 'heavy';
+  if (round >= 8  && r < 0.12) type = 'sniper';
   if (round >= 10 && r < 0.05) type = 'boss';
 
   const cfg = enemyConfig(type, tier);
-  // spawn outside viewport
-  let x, y;
+  // spawn on world edge
   const side = Math.floor(Math.random() * 4);
-  if (side === 0) { x = Math.random() * W; y = -cfg.size; }
-  else if (side === 1) { x = W + cfg.size; y = Math.random() * H; }
-  else if (side === 2) { x = Math.random() * W; y = H + cfg.size; }
-  else { x = -cfg.size; y = Math.random() * H; }
+  let x, y;
+  if (side === 0) { x = Math.random() * MW; y = -cfg.size; }
+  else if (side === 1) { x = MW + cfg.size; y = Math.random() * MH; }
+  else if (side === 2) { x = Math.random() * MW; y = MH + cfg.size; }
+  else                 { x = -cfg.size; y = Math.random() * MH; }
 
-  enemies.push({
-    x, y, type, ...cfg,
-    maxHp: cfg.hp,
-    angle: 0,
-    fireCooldown: Math.floor(Math.random() * cfg.fireRate),
-    id: Math.random(),
-  });
+  enemies.push({ x, y, type, ...cfg, maxHp: cfg.hp, angle: 0,
+    fireCooldown: Math.floor(Math.random() * cfg.fireRate) });
 }
 
 // ─── BULLETS ─────────────────────────────────────────────────────────────────
 function firePlayer() {
   if (player.fireCooldown > 0) return;
   player.fireCooldown = player.fireRate;
-
   const shots = 1 + upgrades.multishot;
-  const spread = (shots - 1) * 0.12;
-  const dx = mouseX - player.x, dy = mouseY - player.y;
-  const baseAngle = Math.atan2(dy, dx);
-
+  const spread = (shots - 1) * 0.13;
+  // mouse in world coords
+  const wx = mouseX + cam.x, wy = mouseY + cam.y;
+  const baseAngle = Math.atan2(wy - player.y, wx - player.x);
   for (let i = 0; i < shots; i++) {
-    const angle = baseAngle - spread / 2 + (spread / Math.max(1, shots - 1)) * i;
+    const angle = baseAngle - spread/2 + (spread / Math.max(1, shots-1)) * i;
     bullets.push({
       x: player.x, y: player.y,
       vx: Math.cos(angle) * player.bulletSpeed,
@@ -353,130 +389,225 @@ function firePlayer() {
       damage: player.damage,
       pierce: upgrades.pierce,
       explosive: upgrades.explosive > 0,
-      life: 120,
+      life: 180,
     });
   }
-  // muzzle flash
   spawnParticles(player.x, player.y, '#ffff88', 4, 2);
 }
 
 function fireEnemy(e) {
-  const dx = player.x - e.x, dy = player.y - e.y;
-  const angle = Math.atan2(dy, dx);
-  enemyBullets.push({
-    x: e.x, y: e.y,
-    vx: Math.cos(angle) * e.bulletSpeed,
-    vy: Math.sin(angle) * e.bulletSpeed,
-    damage: e.damage,
-    life: 150,
-  });
+  const angle = Math.atan2(player.y - e.y, player.x - e.x);
+  enemyBullets.push({ x:e.x, y:e.y,
+    vx: Math.cos(angle)*e.bulletSpeed, vy: Math.sin(angle)*e.bulletSpeed,
+    damage: e.damage, life: 220 });
 }
 
 // ─── PARTICLES ───────────────────────────────────────────────────────────────
 function spawnParticles(x, y, color, count, speed) {
   for (let i = 0; i < count; i++) {
-    const angle = Math.random() * Math.PI * 2;
+    const a = Math.random() * Math.PI * 2;
     const s = (Math.random() + 0.5) * speed;
-    particles.push({
-      x, y,
-      vx: Math.cos(angle) * s,
-      vy: Math.sin(angle) * s,
-      color,
-      life: 20 + Math.random() * 20,
-      maxLife: 40,
-      size: 2 + Math.random() * 3,
-    });
+    particles.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s,
+      color, life: 20 + Math.random()*20, maxLife: 40, size: 2 + Math.random()*3 });
   }
 }
 
-// ─── DRAW TANK ────────────────────────────────────────────────────────────────
+// ─── DRAW HELPERS ────────────────────────────────────────────────────────────
 function drawTank(x, y, angle, size, bodyColor, turretColor, isPlayer) {
   ctx.save();
-  ctx.translate(x, y);
+  ctx.translate(x - cam.x, y - cam.y);
   ctx.rotate(angle);
-
-  // tracks
-  ctx.fillStyle = '#333';
-  ctx.fillRect(-size * 0.9, -size * 0.7, size * 1.8, size * 0.35);
-  ctx.fillRect(-size * 0.9, size * 0.35, size * 1.8, size * 0.35);
-
-  // body
+  ctx.fillStyle = '#2a2a2a';
+  ctx.fillRect(-size*0.9, -size*0.72, size*1.8, size*0.36);
+  ctx.fillRect(-size*0.9,  size*0.36, size*1.8, size*0.36);
   ctx.fillStyle = bodyColor;
-  ctx.fillRect(-size * 0.75, -size * 0.55, size * 1.5, size * 1.1);
-
-  // turret base
+  ctx.fillRect(-size*0.75, -size*0.56, size*1.5, size*1.12);
   ctx.fillStyle = turretColor;
-  ctx.beginPath();
-  ctx.arc(0, 0, size * 0.45, 0, Math.PI * 2);
-  ctx.fill();
-
-  // barrel
-  ctx.fillStyle = turretColor;
-  ctx.fillRect(0, -size * 0.12, size * 1.1, size * 0.24);
-
+  ctx.beginPath(); ctx.arc(0, 0, size*0.46, 0, Math.PI*2); ctx.fill();
+  ctx.fillRect(0, -size*0.13, size*1.15, size*0.26);
   if (isPlayer) {
-    // player indicator dot
     ctx.fillStyle = '#88ff88';
-    ctx.beginPath();
-    ctx.arc(0, 0, 3, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI*2); ctx.fill();
   }
   ctx.restore();
 }
 
-// ─── DRAW HP BAR ─────────────────────────────────────────────────────────────
-function drawHpBar(x, y, hp, maxHp, w, h) {
-  ctx.fillStyle = '#111';
-  ctx.fillRect(x - w/2, y, w, h);
-  const pct = Math.max(0, hp / maxHp);
-  const barColor = pct > 0.5 ? '#44cc44' : pct > 0.25 ? '#cccc22' : '#cc2222';
-  ctx.fillStyle = barColor;
-  ctx.fillRect(x - w/2, y, w * pct, h);
+function drawHpBar(wx, wy, hp, maxHp, w, h) {
+  const sx = wx - cam.x, sy = wy - cam.y;
+  ctx.fillStyle = '#111'; ctx.fillRect(sx - w/2, sy, w, h);
+  const pct = Math.max(0, hp/maxHp);
+  ctx.fillStyle = pct > 0.5 ? '#44cc44' : pct > 0.25 ? '#cccc22' : '#cc2222';
+  ctx.fillRect(sx - w/2, sy, w*pct, h);
 }
 
-// ─── ROUND ANNOUNCE ──────────────────────────────────────────────────────────
-function announceRound(text) {
-  const el = document.getElementById('roundAnnounce');
-  el.textContent = text;
-  el.style.opacity = '1';
-  setTimeout(() => { el.style.opacity = '0'; }, 1800);
-}
+// ─── DRAW WORLD ──────────────────────────────────────────────────────────────
+function drawWorld() {
+  const cx = cam.x, cy = cam.y;
 
-// ─── ROUND SETUP ─────────────────────────────────────────────────────────────
-function startRound() {
-  state = 'playing';
-  enemies = [];
-  bullets = [];
-  enemyBullets = [];
-  particles = [];
+  // base grass
+  ctx.fillStyle = '#2d4a1e';
+  ctx.fillRect(0, 30, VW, VH - 30);
 
-  // number of enemies scales with round
-  roundEnemiesTotal = 3 + round * 2 + Math.floor(round / 5) * 3;
-  roundEnemiesLeft = roundEnemiesTotal;
-  spawnQueue = roundEnemiesTotal;
-  spawnCooldown = 0;
+  for (const obj of worldObjects) {
+    if (obj.type === 'dirtPaths') {
+      ctx.fillStyle = '#5a4a30';
+      for (const p of obj.paths) {
+        ctx.fillRect(p.x - cx, p.y - cy + 30, p.w, p.h);
+      }
+    }
+    if (obj.type === 'grassPatches') {
+      const shades = ['#3a5e24', '#325020', '#2a4418'];
+      for (const p of obj.patches) {
+        ctx.fillStyle = shades[p.shade];
+        ctx.beginPath();
+        ctx.ellipse(p.x - cx, p.y - cy + 30, p.r, p.r * 0.6, 0, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+  }
 
-  document.getElementById('roundText').textContent = round;
-  announceRound(`RUNDE ${round}${round % 5 === 0 ? ' — ANGRIFFSWELLE!' : ''}`);
+  // subtle grid (faint)
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+  ctx.lineWidth = 1;
+  const gs = 60;
+  const sx0 = Math.floor(cx/gs)*gs, sy0 = Math.floor(cy/gs)*gs;
+  for (let x = sx0; x < cx + VW; x += gs) {
+    ctx.beginPath(); ctx.moveTo(x - cx, 30); ctx.lineTo(x - cx, VH); ctx.stroke();
+  }
+  for (let y = sy0; y < cy + VH; y += gs) {
+    ctx.beginPath(); ctx.moveTo(0, y - cy + 30); ctx.lineTo(VW, y - cy + 30); ctx.stroke();
+  }
+
+  // rubble
+  for (const obj of worldObjects) {
+    if (obj.type === 'rubble') {
+      for (const r of obj.items) {
+        const rx = r.x - cx, ry = r.y - cy + 30;
+        if (rx < -40 || rx > VW + 40 || ry < -40 || ry > VH + 40) continue;
+        ctx.fillStyle = '#5a4a38';
+        ctx.beginPath(); ctx.ellipse(rx, ry, r.size, r.size*0.6, 0.3, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#4a3a28';
+        ctx.beginPath(); ctx.ellipse(rx + r.size*0.3, ry - r.size*0.2, r.size*0.5, r.size*0.35, -0.4, 0, Math.PI*2); ctx.fill();
+      }
+    }
+  }
+
+  // destroyed walls
+  for (const obj of worldObjects) {
+    if (obj.type !== 'wall') continue;
+    const wx = obj.x - cx, wy = obj.y - cy + 30;
+    if (wx > VW + 20 || wx + obj.w < -20 || wy > VH + 20 || wy + obj.h < -20) continue;
+    // concrete base
+    ctx.fillStyle = '#7a7060';
+    ctx.fillRect(wx, wy, obj.w, obj.h);
+    // cracks / damage pattern — missing chunks
+    ctx.fillStyle = '#2d4a1e'; // reveal ground
+    const chunkW = obj.w > obj.h ? obj.w * 0.25 : obj.w;
+    const chunkH = obj.w > obj.h ? obj.h : obj.h * 0.3;
+    ctx.fillRect(wx + obj.w * 0.3, wy, chunkW * 0.6, chunkH * 0.7);
+    // darker edge detail
+    ctx.strokeStyle = '#555040';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(wx, wy, obj.w, obj.h);
+    // rubble at base
+    ctx.fillStyle = '#6a6050';
+    ctx.fillRect(wx + 2, wy + obj.h, obj.w * 0.4, 5);
+  }
+
+  // destroyed houses
+  for (const obj of worldObjects) {
+    if (obj.type !== 'house') continue;
+    const hx = obj.x - cx, hy = obj.y - cy + 30;
+    if (hx > VW + 40 || hx + obj.w < -40 || hy > VH + 40 || hy + obj.h < -40) continue;
+
+    // floor / foundation
+    ctx.fillStyle = '#5a4e3c';
+    ctx.fillRect(hx + 4, hy + 4, obj.w - 8, obj.h - 8);
+
+    // wall color
+    ctx.fillStyle = '#8a7a60';
+
+    // left wall (intact)
+    ctx.fillRect(hx, hy, 10, obj.h);
+    // bottom wall (partial)
+    ctx.fillRect(hx, hy + obj.h - 10, obj.w * 0.6, 10);
+    // right wall (damaged — only lower half)
+    ctx.fillRect(hx + obj.w - 10, hy + obj.h * 0.45, 10, obj.h * 0.55);
+    // top wall (partial, gap in middle)
+    ctx.fillRect(hx, hy, obj.w * 0.35, 10);
+    ctx.fillRect(hx + obj.w * 0.65, hy, obj.w * 0.35, 10);
+
+    // window holes (dark)
+    ctx.fillStyle = '#1a1410';
+    ctx.fillRect(hx + 15, hy + 15, 18, 14);
+    ctx.fillRect(hx + obj.w - 33, hy + obj.h - 36, 16, 14);
+
+    // rubble inside
+    ctx.fillStyle = '#6a5a44';
+    ctx.fillRect(hx + obj.w*0.3, hy + obj.h*0.5, 25, 10);
+    ctx.fillRect(hx + obj.w*0.55, hy + obj.h*0.3, 18, 8);
+
+    // outline
+    ctx.strokeStyle = '#4a3e2c';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(hx, hy, obj.w, obj.h);
+  }
+
+  // trees / bushes
+  for (const obj of worldObjects) {
+    if (obj.type !== 'trees') continue;
+    for (const t of obj.items) {
+      const tx = t.x - cx, ty = t.y - cy + 30;
+      if (tx < -40 || tx > VW + 40 || ty < -40 || ty > VH + 40) continue;
+      if (t.isTree) {
+        // trunk
+        ctx.fillStyle = '#5a3a20';
+        ctx.fillRect(tx - 3, ty - 4, 6, 12);
+        // canopy
+        ctx.fillStyle = '#1e4a10';
+        ctx.beginPath(); ctx.arc(tx, ty - t.r * 0.3, t.r, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#2a5a14';
+        ctx.beginPath(); ctx.arc(tx - t.r*0.3, ty - t.r*0.1, t.r*0.7, 0, Math.PI*2); ctx.fill();
+      } else {
+        // bush
+        ctx.fillStyle = '#2a5014';
+        ctx.beginPath(); ctx.arc(tx, ty, t.r, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#346018';
+        ctx.beginPath(); ctx.arc(tx - t.r*0.3, ty - t.r*0.2, t.r*0.6, 0, Math.PI*2); ctx.fill();
+      }
+    }
+  }
+
+  // world border
+  ctx.strokeStyle = '#1a2a10';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(-cx, 30 - cy, MW, MH);
 }
 
 // ─── UPDATE ──────────────────────────────────────────────────────────────────
 function update(dt) {
   if (state !== 'playing') return;
 
-  // player movement
   let dx = 0, dy = 0;
   if (keys['w'] || keys['arrowup'])    dy -= 1;
   if (keys['s'] || keys['arrowdown'])  dy += 1;
   if (keys['a'] || keys['arrowleft'])  dx -= 1;
   if (keys['d'] || keys['arrowright']) dx += 1;
-  if (dx !== 0 && dy !== 0) { dx *= 0.707; dy *= 0.707; }
-  player.x = Math.max(player.size, Math.min(W - player.size, player.x + dx * player.speed));
-  player.y = Math.max(player.size + 30, Math.min(H - player.size, player.y + dy * player.speed));
-  player.angle = Math.atan2(mouseY - player.y, mouseX - player.x);
+  if (dx && dy) { dx *= 0.707; dy *= 0.707; }
 
-  // fire cooldown
+  const nx = player.x + dx * player.speed;
+  const ny = player.y + dy * player.speed;
+  if (!collidesWithWorld(nx, player.y, player.size + 2) && nx > player.size && nx < MW - player.size)
+    player.x = nx;
+  if (!collidesWithWorld(player.x, ny, player.size + 2) && ny > player.size && ny < MH - player.size)
+    player.y = ny;
+
+  // world-space mouse angle
+  const wx = mouseX + cam.x, wy = mouseY + cam.y;
+  player.angle = Math.atan2(wy - player.y, wx - player.x);
+
   if (player.fireCooldown > 0) player.fireCooldown--;
+  if (mouseDown) firePlayer();
 
   // regen
   if (upgrades.regen > 0) {
@@ -488,74 +619,70 @@ function update(dt) {
     }
   }
 
-  // spawn enemies
-  if (spawnQueue > 0 && enemies.length < Math.min(8 + round, 20)) {
+  // camera follows player (clamped)
+  cam.x = Math.max(0, Math.min(MW - VW, player.x - VW/2));
+  cam.y = Math.max(0, Math.min(MH - (VH-30), player.y - (VH-30)/2));
+
+  // spawn
+  if (spawnQueue > 0 && enemies.length < Math.min(8 + round, 22)) {
     spawnCooldown--;
     if (spawnCooldown <= 0) {
-      spawnEnemy();
-      spawnQueue--;
-      spawnCooldown = Math.max(20, 80 - round * 3);
+      spawnEnemy(); spawnQueue--;
+      spawnCooldown = Math.max(18, 80 - round * 3);
     }
   }
 
-  // update enemies
+  // enemies
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i];
     const ddx = player.x - e.x, ddy = player.y - e.y;
-    const dist = Math.sqrt(ddx * ddx + ddy * ddy);
+    const dist = Math.sqrt(ddx*ddx + ddy*ddy);
     e.angle = Math.atan2(ddy, ddx);
 
     if (dist > e.size + player.size) {
-      e.x += (ddx / dist) * e.speed;
-      e.y += (ddy / dist) * e.speed;
+      const nx2 = e.x + (ddx/dist)*e.speed;
+      const ny2 = e.y + (ddy/dist)*e.speed;
+      if (!collidesWithWorld(nx2, e.y, e.size+1)) e.x = nx2;
+      if (!collidesWithWorld(e.x, ny2, e.size+1)) e.y = ny2;
     } else {
-      // ram player
-      player.hp -= e.damage * 0.05;
-      if (upgrades.armor > 0) player.hp += upgrades.armor * 0.05 * 4;
+      player.hp -= e.damage * 0.05 - upgrades.armor * 0.05 * 4;
       updateHud();
       if (player.hp <= 0) { gameOver(); return; }
     }
 
-    // enemy fire
     e.fireCooldown--;
-    if (e.fireCooldown <= 0 && dist < 400) {
-      fireEnemy(e);
-      e.fireCooldown = e.fireRate;
+    if (e.fireCooldown <= 0 && dist < 500) {
+      fireEnemy(e); e.fireCooldown = e.fireRate;
     }
   }
 
-  // update player bullets
+  // player bullets
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i];
     b.x += b.vx; b.y += b.vy; b.life--;
-    if (b.life <= 0 || b.x < 0 || b.x > W || b.y < 30 || b.y > H) {
+    if (b.life <= 0 || b.x < 0 || b.x > MW || b.y < 0 || b.y > MH ||
+        collidesWithWorld(b.x, b.y, 4)) {
       bullets.splice(i, 1); continue;
     }
-    // hit enemies
     let hit = false;
     for (let j = enemies.length - 1; j >= 0; j--) {
       const e = enemies[j];
-      const dx2 = b.x - e.x, dy2 = b.y - e.y;
-      if (dx2 * dx2 + dy2 * dy2 < (e.size + 5) * (e.size + 5)) {
+      const dx2 = b.x-e.x, dy2 = b.y-e.y;
+      if (dx2*dx2+dy2*dy2 < (e.size+5)*(e.size+5)) {
         e.hp -= b.damage;
         spawnParticles(b.x, b.y, '#ff8822', 6, 3);
         if (b.explosive) {
-          // splash
-          spawnParticles(b.x, b.y, '#ffaa00', 12, 5);
-          for (let k = enemies.length - 1; k >= 0; k--) {
-            const e2 = enemies[k];
-            const sdx = b.x - e2.x, sdy = b.y - e2.y;
-            if (sdx * sdx + sdy * sdy < 2500) {
-              e2.hp -= b.damage * 0.5;
-            }
+          spawnParticles(b.x, b.y, '#ffaa00', 14, 5);
+          for (const e2 of enemies) {
+            const sdx=b.x-e2.x, sdy=b.y-e2.y;
+            if (sdx*sdx+sdy*sdy < 3000) e2.hp -= b.damage*0.5;
           }
         }
         if (!b.pierce) { bullets.splice(i, 1); hit = true; }
         if (e.hp <= 0) {
-          score += e.score * round;
-          kills++;
+          score += e.score * round; kills++;
           roundEnemiesLeft--;
-          spawnParticles(e.x, e.y, e.color, 14, 3);
+          spawnParticles(e.x, e.y, e.color, 16, 3);
           enemies.splice(j, 1);
           updateHud();
         }
@@ -564,17 +691,18 @@ function update(dt) {
     }
   }
 
-  // update enemy bullets
+  // enemy bullets
   for (let i = enemyBullets.length - 1; i >= 0; i--) {
     const b = enemyBullets[i];
     b.x += b.vx; b.y += b.vy; b.life--;
-    if (b.life <= 0 || b.x < 0 || b.x > W || b.y < 30 || b.y > H) {
+    if (b.life <= 0 || b.x < 0 || b.x > MW || b.y < 0 || b.y > MH ||
+        collidesWithWorld(b.x, b.y, 4)) {
       enemyBullets.splice(i, 1); continue;
     }
-    const ddx = b.x - player.x, ddy = b.y - player.y;
-    if (ddx * ddx + ddy * ddy < (player.size + 4) * (player.size + 4)) {
-      let dmg = b.damage - upgrades.armor * 4;
-      player.hp -= Math.max(1, dmg);
+    const ddx = b.x-player.x, ddy = b.y-player.y;
+    if (ddx*ddx+ddy*ddy < (player.size+4)*(player.size+4)) {
+      const dmg = Math.max(1, b.damage - upgrades.armor*4);
+      player.hp -= dmg;
       spawnParticles(b.x, b.y, '#ff4444', 5, 2);
       enemyBullets.splice(i, 1);
       updateHud();
@@ -582,44 +710,30 @@ function update(dt) {
     }
   }
 
-  // update particles
+  // particles
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
     p.x += p.vx; p.y += p.vy;
-    p.vx *= 0.92; p.vy *= 0.92;
+    p.vx *= 0.91; p.vy *= 0.91;
     p.life--;
     if (p.life <= 0) particles.splice(i, 1);
   }
 
-  // check round end
-  if (spawnQueue === 0 && enemies.length === 0 && roundEnemiesLeft <= 0) {
-    roundComplete();
-  }
+  if (spawnQueue === 0 && enemies.length === 0 && roundEnemiesLeft <= 0) roundComplete();
 }
 
 // ─── DRAW ─────────────────────────────────────────────────────────────────────
 function draw() {
-  // background grid
-  ctx.fillStyle = '#0d1a0d';
-  ctx.fillRect(0, 30, W, H - 30);
+  drawWorld();
 
-  ctx.strokeStyle = '#1a2a1a';
-  ctx.lineWidth = 1;
-  const gridSize = 40;
-  for (let x = 0; x < W; x += gridSize) {
-    ctx.beginPath(); ctx.moveTo(x, 30); ctx.lineTo(x, H); ctx.stroke();
-  }
-  for (let y = 30; y < H; y += gridSize) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-  }
-
-  // particles
+  // particles (world space)
+  ctx.globalAlpha = 1;
   for (const p of particles) {
     const alpha = p.life / p.maxLife;
     ctx.globalAlpha = alpha;
     ctx.fillStyle = p.color;
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+    ctx.arc(p.x - cam.x, p.y - cam.y + 30, p.size * alpha, 0, Math.PI*2);
     ctx.fill();
   }
   ctx.globalAlpha = 1;
@@ -627,43 +741,67 @@ function draw() {
   // player bullets
   for (const b of bullets) {
     ctx.fillStyle = '#ffff44';
-    ctx.shadowBlur = 6;
-    ctx.shadowColor = '#ffaa00';
-    ctx.beginPath();
-    ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.shadowBlur = 7; ctx.shadowColor = '#ffaa00';
+    ctx.beginPath(); ctx.arc(b.x - cam.x, b.y - cam.y + 30, 4, 0, Math.PI*2); ctx.fill();
     ctx.shadowBlur = 0;
   }
 
   // enemy bullets
   for (const b of enemyBullets) {
-    ctx.fillStyle = '#ff4444';
-    ctx.shadowBlur = 6;
-    ctx.shadowColor = '#ff0000';
-    ctx.beginPath();
-    ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillStyle = '#ff5544';
+    ctx.shadowBlur = 7; ctx.shadowColor = '#ff1100';
+    ctx.beginPath(); ctx.arc(b.x - cam.x, b.y - cam.y + 30, 4, 0, Math.PI*2); ctx.fill();
     ctx.shadowBlur = 0;
   }
 
   // enemies
   for (const e of enemies) {
-    drawTank(e.x, e.y, e.angle, e.size, e.color, '#882222', false);
-    drawHpBar(e.x, e.y - e.size - 10, e.hp, e.maxHp, e.size * 2.5, 5);
-    // label for boss
+    const sx = e.x - cam.x, sy = e.y - cam.y + 30;
+    if (sx < -40 || sx > VW+40 || sy < -10 || sy > VH+40) continue;
+    drawTank(e.x, e.y - 30, e.angle, e.size, e.color, '#882222', false);
+    drawHpBar(e.x, e.y - e.size - 10 - 30, e.hp, e.maxHp, e.size*2.5, 5);
     if (e.type === 'boss') {
       ctx.fillStyle = '#ff4444';
-      ctx.font = 'bold 10px Courier New';
-      ctx.textAlign = 'center';
-      ctx.fillText('BOSS', e.x, e.y - e.size - 16);
+      ctx.font = 'bold 10px Courier New'; ctx.textAlign = 'center';
+      ctx.fillText('BOSS', e.x - cam.x, e.y - e.size - 17 - cam.y + 30);
     }
   }
 
   // player
-  drawTank(player.x, player.y, player.angle, player.size, '#336633', '#224422', true);
+  drawTank(player.x, player.y - 30, player.angle, player.size, '#336633', '#224422', true);
+
+  drawMinimap();
 }
 
-// ─── HUD UPDATE ──────────────────────────────────────────────────────────────
+// ─── MINIMAP ─────────────────────────────────────────────────────────────────
+function drawMinimap() {
+  const mw = 120, mh = 80;
+  const scx = mw / MW, scy = mh / MH;
+  mmCtx.fillStyle = '#1a2a10';
+  mmCtx.fillRect(0, 0, mw, mh);
+
+  // houses on minimap
+  mmCtx.fillStyle = '#6a5a40';
+  for (const obj of worldObjects) {
+    if (obj.type === 'house') mmCtx.fillRect(obj.x*scx, obj.y*scy, obj.w*scx+1, obj.h*scy+1);
+    if (obj.type === 'wall')  mmCtx.fillRect(obj.x*scx, obj.y*scy, Math.max(2,obj.w*scx), Math.max(2,obj.h*scy));
+  }
+
+  // enemies
+  mmCtx.fillStyle = '#ff4444';
+  for (const e of enemies) mmCtx.fillRect(e.x*scx - 1, e.y*scy - 1, 3, 3);
+
+  // player
+  mmCtx.fillStyle = '#44ff88';
+  mmCtx.fillRect(player.x*scx - 2, player.y*scy - 2, 5, 5);
+
+  // viewport box
+  mmCtx.strokeStyle = '#ffffff44';
+  mmCtx.lineWidth = 1;
+  mmCtx.strokeRect(cam.x*scx, cam.y*scy, VW*scx, (VH-30)*scy);
+}
+
+// ─── HUD ─────────────────────────────────────────────────────────────────────
 function updateHud() {
   const pct = Math.max(0, player.hp / player.maxHp * 100);
   document.getElementById('healthFill').style.width = pct + '%';
@@ -673,24 +811,42 @@ function updateHud() {
   document.getElementById('roundText').textContent = round;
 }
 
-// ─── ROUND COMPLETE ──────────────────────────────────────────────────────────
+// ─── ROUND ───────────────────────────────────────────────────────────────────
+function announceRound(text) {
+  const el = document.getElementById('roundAnnounce');
+  el.textContent = text; el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, 1800);
+}
+
+function startRound() {
+  state = 'playing';
+  enemies = []; bullets = []; enemyBullets = []; particles = [];
+  roundEnemiesTotal = 3 + round * 2 + Math.floor(round / 5) * 3;
+  roundEnemiesLeft = roundEnemiesTotal;
+  spawnQueue = roundEnemiesTotal;
+  spawnCooldown = 0;
+  updateHud();
+  announceRound(`RUNDE ${round}${round % 5 === 0 ? ' — ANGRIFFSWELLE!' : ''}`);
+}
+
 function roundComplete() {
   state = 'upgrade';
-  // heal a bit between rounds
   player.hp = Math.min(player.maxHp, player.hp + 20);
   updateHud();
 
   const choices = pickUpgrades();
   const container = document.getElementById('upgradeCards');
   container.innerHTML = '';
+  const rarityColor = { common:'#44aa44', rare:'#4488ff', epic:'#cc44cc' };
   for (const u of choices) {
     const card = document.createElement('div');
     card.className = 'upgrade-card';
+    card.style.borderColor = rarityColor[u.rarity];
     card.innerHTML = `
       <div class="icon">${u.icon}</div>
-      <div class="name">${u.name}</div>
+      <div class="name" style="color:${rarityColor[u.rarity]}">${u.name}</div>
       <div class="desc">${u.desc}</div>
-      <div style="margin-top:8px;font-size:10px;color:${u.rarity==='epic'?'#cc44cc':u.rarity==='rare'?'#4444ff':'#44aa44'}">${u.rarity.toUpperCase()}</div>
+      <div class="rarity-tag" style="color:${rarityColor[u.rarity]}">${u.rarity.toUpperCase()}</div>
     `;
     card.onclick = () => selectUpgrade(u.id);
     container.appendChild(card);
@@ -702,7 +858,6 @@ function selectUpgrade(id) {
   upgrades[id]++;
   document.getElementById('upgradeScreen').style.display = 'none';
   round++;
-  // rebuild player with new upgrades (keep hp)
   const prevHp = player.hp;
   resetPlayer();
   player.hp = Math.min(player.maxHp, prevHp);
@@ -710,7 +865,6 @@ function selectUpgrade(id) {
   startRound();
 }
 
-// ─── GAME OVER ───────────────────────────────────────────────────────────────
 function gameOver() {
   state = 'dead';
   document.getElementById('overlay').innerHTML = `
@@ -722,26 +876,25 @@ function gameOver() {
   document.getElementById('overlay').style.display = 'flex';
 }
 
-// ─── START GAME ──────────────────────────────────────────────────────────────
 function startGame() {
   document.getElementById('overlay').style.display = 'none';
   document.getElementById('upgradeScreen').style.display = 'none';
   round = 1; score = 0; kills = 0;
   upgrades = { speed:0,fireRate:0,damage:0,multishot:0,bulletSpeed:0,maxHp:0,armor:0,regen:0,explosive:0,pierce:0 };
+  buildWorld();
   resetPlayer();
+  cam.x = Math.max(0, Math.min(MW - VW, player.x - VW/2));
+  cam.y = Math.max(0, Math.min(MH - (VH-30), player.y - (VH-30)/2));
   updateHud();
   startRound();
   if (!lastTime) requestAnimationFrame(loop);
 }
 
-// ─── GAME LOOP ────────────────────────────────────────────────────────────────
+// ─── LOOP ─────────────────────────────────────────────────────────────────────
 function loop(ts) {
-  const dt = Math.min((ts - (lastTime || ts)) / 16.67, 3);
   lastTime = ts;
-
-  update(dt);
+  update(1);
   draw();
-
   requestAnimationFrame(loop);
 }
 
@@ -755,26 +908,15 @@ document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 canvas.addEventListener('mousemove', e => {
   const rect = canvas.getBoundingClientRect();
   mouseX = e.clientX - rect.left;
-  mouseY = e.clientY - rect.top;
+  mouseY = e.clientY - rect.top - 30;
 });
-
-canvas.addEventListener('mousedown', e => {
-  if (state === 'playing') firePlayer();
-});
-
+canvas.addEventListener('mousedown', () => { mouseDown = true; if (state === 'playing') firePlayer(); });
+canvas.addEventListener('mouseup',   () => { mouseDown = false; });
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 
-// auto-fire on hold
-setInterval(() => {
-  if (state === 'playing' && mouseDown) firePlayer();
-}, 20);
-let mouseDown = false;
-canvas.addEventListener('mousedown', () => mouseDown = true);
-canvas.addEventListener('mouseup', () => mouseDown = false);
-
-// initial draw
-ctx.fillStyle = '#0d1a0d';
-ctx.fillRect(0, 0, W, H);
+// init render
+ctx.fillStyle = '#2d4a1e';
+ctx.fillRect(0, 0, VW, VH);
 </script>
 </body>
 </html>
