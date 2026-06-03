@@ -43,24 +43,6 @@ canvas{display:block;}
     <span>Kills <b id="knum">0</b></span>
   </div>
 
-  <div class="screen" id="menu">
-    <h1>PANZER KRIEG</h1>
-    <p>Besiege Feinde, sammle Upgrades, ueberlebe!</p>
-    <button class="gbtn" id="btnPlay">SPIELEN</button>
-    <button class="sbtn" id="btnCtrl">STEUERUNG</button>
-  </div>
-
-  <div class="screen" id="ctrl" style="display:none;">
-    <h2>STEUERUNG</h2>
-    <table class="ktable">
-      <tr><td>W A S D</td><td>Panzer bewegen</td></tr>
-      <tr><td>Pfeiltasten</td><td>Panzer bewegen</td></tr>
-      <tr><td>Maus</td><td>Turm ausrichten</td></tr>
-      <tr><td>Klick halten</td><td>Dauerfeuer</td></tr>
-    </table>
-    <p>Alle 5 Runden werden Gegner staerker.<br>Nach jeder Runde ein Upgrade auswaehlen.</p>
-    <button class="sbtn" id="btnBack">ZURUECK</button>
-  </div>
 
   <div class="screen" id="upgs" style="display:none;">
     <h2>UPGRADE WAEHLEN</h2>
@@ -84,21 +66,18 @@ var W = 900, H = 640, HUD = 34;
 
 // --- Screens ---
 function showOnly(id) {
-  var ids = ['menu','ctrl','upgs','dead'];
+  var ids = ['upgs','dead'];
   for (var i = 0; i < ids.length; i++) {
     document.getElementById(ids[i]).style.display = (ids[i] === id) ? 'flex' : 'none';
   }
 }
 function hideAll() {
-  var ids = ['menu','ctrl','upgs','dead'];
+  var ids = ['upgs','dead'];
   for (var i = 0; i < ids.length; i++) {
     document.getElementById(ids[i]).style.display = 'none';
   }
 }
 
-document.getElementById('btnPlay').addEventListener('click', function() { startGame(); });
-document.getElementById('btnCtrl').addEventListener('click', function() { showOnly('ctrl'); });
-document.getElementById('btnBack').addEventListener('click', function() { showOnly('menu'); });
 document.getElementById('btnRestart').addEventListener('click', function() { startGame(); });
 
 // --- Globals ---
@@ -562,6 +541,7 @@ function draw() {
 
 // --- Loop ---
 function loop() { update(); draw(); requestAnimationFrame(loop); }
+startGame();
 requestAnimationFrame(loop);
 
 // --- Input ---
